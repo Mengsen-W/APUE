@@ -2,7 +2,8 @@
  * @Author: Mengsen.Wang
  * @Date: 2020-03-31 11:15:41
  * @Last Modified by: Mengsen.Wang
- * @Last Modified time: 2020-03-31 11:22:36
+ * @Last Modified time: 2020-03-31 11:31:29
+ * @Description: 循环读写
  */
 #include <fcntl.h>
 #include <sys/stat.h>
