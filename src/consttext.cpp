@@ -21,8 +21,7 @@ class Obj {
     std::cout << "const Obj&" << std::endl;
   }
   ~Obj() { std::cout << "Obj::~Obj(){}" << std::endl; }
-
- private:
+  int operator*(const Obj& rhs) { return (this->_i * rhs._i); }
   std::string _str;
   int _i;
 };
@@ -38,17 +37,24 @@ int main() {
   // getInstance(a);
   // getInstance(b);
   // getInstance(5);
-  Obj obj1;
-  Obj obj2("wms", 1);
-  Obj obj3{"w", 2};
-  std::string a1 = "wms";
-  int b1 = 1;
-  Obj obj4(a1, b1);
-  Obj obj5(std::move(a1), std::move(b1));
-  const std::string a2 = "wms";
-  const int b2 = 1;
-  Obj obj6{a2, b2};
-  Obj obj7(std::move(a2), std::move(b2));
+  // Obj obj1;
+  // Obj obj2("wms", 1);
+  // Obj obj3{"w", 2};
+  // std::string a1 = "wms";
+  // int b1 = 1;
+  // Obj obj4(a1, b1);
+  // Obj obj5(std::move(a1), std::move(b1));
+  // const std::string a2 = "wms";
+  // const int b2 = 1;
+  // Obj obj6{a2, b2};
+  // Obj obj7(std::move(a2), std::move(b2));
+  Obj a("", 5);
+  Obj b("", 6);
+  Obj c;
+  // int d = a * b;
+  int d;
+  a* b = d;
+  std::cout << (a * b) << '\t' << d << '\t' << "c = " << c._i << std::endl;
   return 0;
 }
 
