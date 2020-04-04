@@ -2,9 +2,11 @@
  * @Author: Mengsen.Wang
  * @Date: 2020-04-04 17:08:17
  * @Last Modified by: Mengsen.Wang
- * @Last Modified time: 2020-04-04 22:07:52
- * @Description: 令牌桶
+ * @Last Modified time: 2020-04-04 22:41:54
+ * @Description: 令牌桶 + sigaction
  */
+//! 系统调用会陷入内核态
+//! shell 在用户态
 
 #include <errno.h>
 #include <fcntl.h>
@@ -13,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -37,29 +40,49 @@ struct mytbf_st {
 
 static struct mytbf_st* job[MYTBF_MAX];
 static int inited = 0;
-static sighandler_t alrm_handler_save;
+static struct sigaction alrm_sa_save;
 
-static void alarm_header(int s) {
-  for (int i = 0; i < MYTBF_MAX; ++i) {
-    if (job[i] != NULL) {
-      job[i]->token += job[i]->cps;
-      if (job[i]->token > job[i]->burst) job[i]->token = job[i]->burst;
+static void alarm_action(int s, siginfo_t* infop, void* unused) {
+  if (infop->si_code == SI_KERNEL)
+    for (int i = 0; i < MYTBF_MAX; ++i) {
+      if (job[i] != NULL) {
+        job[i]->token += job[i]->cps;
+        if (job[i]->token > job[i]->burst) job[i]->token = job[i]->burst;
+      }
     }
-  }
-  alarm(1);
 }
 
 static void module_unload() {
-  signal(SIGALRM, alrm_handler_save);
-  alarm(0);
+  // 恢复状态
+  sigaction(SIGALRM, &alrm_sa_save, nullptr);
+
+  struct itimerval itv;
+  itv.it_interval.tv_sec = 0;
+  itv.it_interval.tv_usec = 0;
+  itv.it_value.tv_sec = 0;
+  itv.it_value.tv_usec = 0;
+
+  setitimer(ITIMER_REAL, &itv, nullptr);
+
   for (int i = 0; i < MYTBF_MAX; ++i) {
     free(job[i]);
   }
 }
 
 static void module_load() {
-  alrm_handler_save = signal(SIGALRM, alarm_header);
-  alarm(1);
+  struct sigaction sa;
+  sa.sa_sigaction = alarm_action;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_SIGINFO;
+  sigaction(SIGALRM, &sa, &alrm_sa_save);
+
+  struct itimerval itv;
+  itv.it_interval.tv_sec = 1;
+  itv.it_interval.tv_usec = 0;
+  itv.it_value.tv_sec = 1;
+  itv.it_value.tv_usec = 0;
+
+  setitimer(ITIMER_REAL, &itv, nullptr);
   atexit(module_unload);
 }
 
