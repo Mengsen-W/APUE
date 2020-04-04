@@ -2,7 +2,7 @@
  * @Author: Mengsen.Wang
  * @Date: 2020-04-04 16:21:05
  * @Last Modified by: Mengsen.Wang
- * @Last Modified time: 2020-04-04 16:36:27
+ * @Last Modified time: 2020-04-04 16:50:23
  * @Description: 定时5秒累加多次
  */
 #include <signal.h>
@@ -13,15 +13,24 @@
 
 static volatile int loop = 1;
 
-static void alrm_handler(int s) { loop = 0; }
+static void alrm_handler(int s) {
+  // alarm 链
+  alarm(1);
+  loop = 0;
+}
 
 int main() {
   long long int count = 0;
-  alarm(5);
   signal(SIGALRM, alrm_handler);
-  while (loop) {
-    ++count;
+  alarm(1);
+  while (1) {
+    while (loop) {
+      ++count;
+    }
+    if (loop == 0) {
+      printf("%lld\n", count);
+      loop = 1;
+    }
   }
-  printf("%lld\n", count);
   return 0;
 }
