@@ -2,11 +2,11 @@
  * @Author: Mengsen.Wang
  * @Date: 2020-04-06 17:14:54
  * @Last Modified by: Mengsen.Wang
- * @Last Modified time: 2020-04-06 19:30:10
+ * @Last Modified time: 2020-04-06 19:57:06
  * @Description: message queue 测试
- * @ 产生了未知的 LeakSanitizer has encountered a fatal error.
  */
 
+// 如果发送方退出接收方会产生未知的 LeakSanitizer has encountered a fatal error.
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,14 +17,14 @@
 #include <unistd.h>
 
 #define KEYPATH "/etc/services"
-#define KEYPROJ 'g'
+#define KEYPROJ 'a'
 #define NAMESIZE 8
 
 struct msg_st {
-  long mtype;
   char name[NAMESIZE];
   int math;
   int chinese;
+  long mtype;
 };
 
 void *sender(void *) {
@@ -45,7 +45,7 @@ void *sender(void *) {
     strcpy(sbuf.name, "Wms");
     sbuf.math = rand() % 100;
     sbuf.chinese = rand() % 100;
-    if (msgsnd(msgid, &sbuf, sizeof(sbuf) - sizeof(long), 0) < 0) {
+    if (msgsnd(msgid, &sbuf, sizeof(struct msg_st) - sizeof(long), 0) < 0) {
       perror("msgrcv()");
       exit(1);
     }
@@ -71,7 +71,7 @@ void *rcver(void *) {
   }
 
   while (true) {
-    if (msgrcv(msgid, (void *)&rbuf, sizeof(rbuf) - sizeof(long), 0, 0) < 0) {
+    if (msgrcv(msgid, &rbuf, sizeof(struct msg_st) - sizeof(long), 0, 0) < 0) {
       perror("msgrcv()");
       exit(1);
     }
@@ -92,15 +92,15 @@ int main() {
   pthread_t tid1, tid2;
   puts("Begin");
 
-  int err1 = pthread_create(&tid1, NULL, rcver, NULL);
+  int err1 = pthread_create(&tid1, NULL, &rcver, NULL);
   if (err1) {
     perror("creat() t1 error");
     exit(1);
   }
 
-  sleep(3);
+  // sleep(3);
 
-  int err2 = pthread_create(&tid2, NULL, sender, NULL);
+  int err2 = pthread_create(&tid2, NULL, &sender, NULL);
   if (err2) {
     perror("creat() t0 error");
     exit(1);
