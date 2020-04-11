@@ -2,7 +2,7 @@
  * @Author: Mengsen.Wang
  * @Date: 2020-04-08 10:07:00
  * @Last Modified by: Mengsen.Wang
- * @Last Modified time: 2020-04-08 10:40:42
+ * @Last Modified time: 2020-04-11 17:16:32
  * @Description: SIGCHID
  */
 
@@ -19,6 +19,7 @@ void do_sig_child(int signo) {
   pid_t pid;
 
   // if ((pid = waitpid(0, &status, WNOHANG)) > 0) {
+  // 防止执行函数的过程中多个信号进入导致最后只有一个子进程被回收了
   while ((pid = waitpid(0, &status, WNOHANG)) > 0) {
     if (WIFEXITED(status))
       printf("------------------ child %d exit %d\n", pid, WEXITSTATUS(status));
