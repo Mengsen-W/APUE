@@ -23,6 +23,8 @@ int main() {
     perror("socket()");
     exit(1);
   }
+  int opt = 1;
+  setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
   struct sockaddr_in serv_addr, clie_addr;
   serv_addr.sin_family = AF_INET;

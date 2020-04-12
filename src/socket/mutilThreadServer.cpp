@@ -2,7 +2,7 @@
  * @Author: Mengsen.Wang
  * @Date: 2020-04-11 17:39:56
  * @Last Modified by: Mengsen.Wang
- * @Last Modified time: 2020-04-11 18:01:33
+ * @Last Modified time: 2020-04-12 16:22:36
  * @Description: 多线程版本
  */
 
@@ -14,7 +14,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define SERV_PORT 8888
+#define SERV_PORT 6666
 
 struct s_info {
   struct sockaddr_in cliaddr;

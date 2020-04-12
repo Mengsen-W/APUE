@@ -2,7 +2,7 @@
  * @Author: Mengsen.Wang
  * @Date: 2020-04-11 11:31:32
  * @Last Modified by: Mengsen.Wang
- * @Last Modified time: 2020-04-11 11:55:26
+ * @Last Modified time: 2020-04-12 21:57:00
  * @Description: 服务端
  */
 
@@ -29,12 +29,12 @@ int main() {
 
   char buf[BUFSIZ];
   while (1) {
-    char* s = fgets(buf, BUFSIZ, stdin);
-    if (s == NULL) {
-      perror("fgets()");
-      exit(1);
-    }
-    int wlen = write(cfd, buf, strlen(buf));
+    // char* s = fgets(buf, BUFSIZ, stdin);
+    // if (s == NULL) {
+    //   perror("fgets()");
+    //   exit(1);
+    // }
+    int wlen = write(cfd, "a\n", 2);
     if (wlen < 0) {
       perror("write()");
       exit(1);
