@@ -20,7 +20,7 @@
 
 static int SERV_PORT = 6666;
 static int OPEN_MAX = 5000;
-static int MAXLINE = 10;
+static int MAXLINE = 12;
 
 int main(int argc, char *argv[]) {
   char buf[BUFSIZ];
@@ -90,11 +90,24 @@ int main(int argc, char *argv[]) {
     printf("res = %d\n", res);
     if (ep[0].data.fd == connfd) {
       int len = 0;  // 通过非阻塞IO用边缘触发达到水平触发
-      while ((len = read(connfd, buf, MAXLINE / 2)) > 0) {
-        int we = write(STDOUT_FILENO, buf, len);
-        if (we < 0) {
-          perror("write()");
-          exit(1);
+      while (1) {
+        len = read(connfd, buf, MAXLINE / 2);
+        printf("write()begin = len  = %d\n", len);
+        sleep(2);
+        if (len > 0) {
+          int we = write(STDOUT_FILENO, buf, len);
+          if (we < 0) {
+            perror("write()");
+            exit(1);
+          }
+        } else if (len == 0) {
+          printf("write() end\n");
+          close(connfd);
+          break;
+        } else {
+          perror("write()\n");
+          // EAGAIN 这个在非阻塞上面是正常的
+          printf("%d\n",(errno));
         }
       }
     }

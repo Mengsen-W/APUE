@@ -41,7 +41,7 @@ int main() {
     buf[i - 1] = '\n';
     ++ch;
     int wlen = write(cfd, buf, MAXLINE);
-    sleep(5);
+    sleep(10);
     if (wlen < 0) {
       perror("write()");
       exit(1);
