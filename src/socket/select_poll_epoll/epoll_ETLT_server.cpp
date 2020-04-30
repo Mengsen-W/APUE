@@ -7,6 +7,10 @@
  */
 
 //! nonblock ET 最牛逼
+// 没有数据的时候 非阻塞IO 不会卡住
+// 会返回一个错误码用来判断状态
+// 如果不是非阻塞只调用一次事件触发读取完成后
+// 下一次就会卡在 write() 函数, epoll_wait() 也执行不到了
 
 #include <arpa/inet.h>
 #include <ctype.h>
